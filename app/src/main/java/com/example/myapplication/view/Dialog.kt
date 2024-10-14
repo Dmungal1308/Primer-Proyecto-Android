@@ -1,50 +1,37 @@
-package com.example.myapplication.view
-
 import com.example.myapplication.data.RepositoryClient
-import com.example.myapplication.logic.Controller
-import com.example.myapplication.logic.interfac.OperationsInterface
 
-class Dialog(var controller: Controller) {
-    private var listener: OperationsInterface? = null
+class Dialog {
+    private var onAdd: ((Int, String, String, Int) -> Unit)? = null
+    private var onUpdate: ((Int, String, String, Int) -> Unit)? = null
+    private var onDelete: ((Int) -> Unit)? = null
+    private var currentClientId: Int? = null
 
-    private var action : Int = 0
-
-    //Carga el listener para el botón
-    fun setListener ( _listener : OperationsInterface){
-        listener = _listener
-
+    fun setOnAddListener(listener: (Int, String, String, Int) -> Unit) {
+        onAdd = listener
     }
 
-    fun show(typeAction : Int){
-        listener?.let{
-            val posibleName = "CAMBIADO"
-            val posibleId = controller.devIdRandom()
-            when (typeAction){
-                0 -> onAccept()
+    fun setOnUpdateListener(listener: (Int, String, String, Int) -> Unit) {
+        onUpdate = listener
+    }
 
-                1 ->
-                    if (posibleId != -1)
-                        onEdit(posibleId, "CAMBIADO")
+    fun setOnDeleteListener(listener: (Int) -> Unit) {
+        onDelete = listener
+    }
 
-                2 ->
-                    if (posibleId != -1)
-                        onDelete(posibleId)
-
+    fun show(typeAction: Int, clientId: Int? = null) {
+        currentClientId = clientId
+        when (typeAction) {
+            0 -> onAccept()
+            1 -> currentClientId?.let {
+                onUpdate?.invoke(it, "Nombre Cambiado", "Apellido Cambiado", 1324543342)
             }
-
+            2 -> currentClientId?.let {
+                onDelete?.invoke(it)
+            }
         }
     }
 
-    private fun onDelete(id : Int) {
-        listener!!.ClientDel(id)
-    }
-
-    private fun onEdit(id: Int, name : String) {
-        listener!!.ClientUpdate(id, name)
-    }
-
     private fun onAccept() {
-        listener!!.ClientAdd(RepositoryClient.incrementPrimary(), "NUEVO CLIENTE")
+        onAdd?.invoke(RepositoryClient.incrementPrimary(), "Cliente Nuevo", "Apellido Nuevo", 1234435633)
     }
-    
 }
