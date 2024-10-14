@@ -27,7 +27,6 @@ class Controller {
 
     fun showData() = myListClient.toString()
 
-    fun devClient (pos : Int) = myListClient.find {  it.id == pos }
 
 
     fun devIdRandom() : Int{

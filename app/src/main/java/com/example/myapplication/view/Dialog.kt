@@ -44,7 +44,8 @@ class Dialog(var controller: Controller) {
     }
 
     private fun onAccept() {
-        listener!!.ClientAdd(RepositoryClient.incrementPrimary(), "NUEVO CLIENTE")
+        listener!!.ClientAdd(RepositoryClient.incrementPrimary(), "NUEVO CLIENTE", "NUEVO APELLIDO", 123456789
+        )
     }
     
 }

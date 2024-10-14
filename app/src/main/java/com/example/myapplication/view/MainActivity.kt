@@ -70,8 +70,8 @@ class MainActivity : AppCompatActivity(), OperationsInterface {
     }
 
 
-    override fun ClientAdd(id: Int, name: String){
-        val newClient = Client (id, name)
+    override fun ClientAdd(id: Int, name: String, apellidos: String, telefono: Int){
+        val newClient = Client (id, name, apellidos, telefono)
         controller.ClientAddController(newClient)
         var msg =  "El cliente con id = $id, ha sido insertado correctamente"
 
