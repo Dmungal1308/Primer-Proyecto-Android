@@ -13,6 +13,7 @@ import com.example.myapplication.logic.Controller
 import com.example.myapplication.logic.interfac.OperationsInterface
 
 class MainActivity : AppCompatActivity(), OperationsInterface {
+
     private lateinit var myButtonAdd: ImageView
     private lateinit var myButtonUpdate: ImageView
     private lateinit var myButtonDel: ImageView
