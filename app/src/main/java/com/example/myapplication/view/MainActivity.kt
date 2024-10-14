@@ -10,7 +10,6 @@ import com.example.myapplication.data.RepositoryClient
 import com.example.myapplication.logic.Client
 
 class MainActivity : AppCompatActivity() {
-
     private lateinit var myButtonAdd: ImageView
     private lateinit var myButtonUpdate: ImageView
     private lateinit var myButtonDel: ImageView
