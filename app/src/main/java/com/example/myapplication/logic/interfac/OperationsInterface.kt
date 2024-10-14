@@ -1,7 +1,0 @@
-package com.example.myapplication.logic.interfac
-
-interface OperationsInterface {
-    fun ClientAdd(id : Int, name : String, apellidos: String, telefono: Int)
-    fun ClientDel(id : Int)
-    fun ClientUpdate(id : Int, name : String)
-}

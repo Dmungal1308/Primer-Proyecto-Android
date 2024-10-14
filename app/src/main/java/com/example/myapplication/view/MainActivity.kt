@@ -1,117 +1,92 @@
 package com.example.myapplication.view
 
+import Dialog
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.example.myapplication.R
+import com.example.myapplication.data.RepositoryClient
 import com.example.myapplication.logic.Client
-import com.example.myapplication.logic.Controller
-import com.example.myapplication.logic.interfac.OperationsInterface
 
-class MainActivity : AppCompatActivity(), OperationsInterface {
+class MainActivity : AppCompatActivity() {
 
     private lateinit var myButtonAdd: ImageView
     private lateinit var myButtonUpdate: ImageView
     private lateinit var myButtonDel: ImageView
-    private lateinit var myDialog : Dialog
-    private val controller= Controller()
+    private lateinit var myDialog: Dialog
+    private lateinit var myListClient: MutableList<Client>
 
     companion object {
         const val TAG = "---SALIDA---"
     }
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //      enableEdgeToEdge()  //barra superior transparente. App de borde a borde (toaaaa)
         setContentView(R.layout.activity_main)
-//        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-//            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-//            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-//            insets
-//        }
-        Log. d(TAG, "Esto es un ejemplo de log")
+
+        Log.d(TAG, "Esto es un ejemplo de log")
+        myListClient = RepositoryClient.arrayClient.toMutableList()
         start()
     }
 
-
-
-
-    //Aquí comienza todo. Como si fuera nuestro main
+    // Aquí comienza todo. Como si fuera nuestro main
     private fun start() {
-        myButtonAdd = findViewById(R.id.iv_add)   //Recuperamos la referencia en memoria del botón de la interfaz.
+        myButtonAdd = findViewById(R.id.iv_add)
         myButtonUpdate = findViewById(R.id.iv_update)
         myButtonDel = findViewById(R.id.iv_del)
-        myDialog = Dialog(controller)
 
-        myDialog.setListener(this) //Le paso mi referencia como objeto que estoy obligado a implementar los tres métodos.
+        myDialog = Dialog().apply {
+            setOnAddListener { id, name, apellidos, telefono ->
+                val newClient = Client(id, name, apellidos, telefono)
+                myListClient.add(newClient)  // Agregamos el nuevo cliente a la lista
+                Log.d(TAG, "El cliente con id = $id, ha sido insertado correctamente")
+                showConsoleData()  // Mostrar datos actualizados
+            }
 
-        myButtonAdd.setOnClickListener{
-            //acepta una lambda, por tanto es una referencia a una función anónima.
-            myDialog.show(0)  //mostramos el dialogo que me permite la inserción de datos en los campos de edición.
+            setOnUpdateListener { id, name, apellidos, telefono ->
+                val findClient: Client? = myListClient.find { it.id == id }
+                if (findClient != null) {
+                    findClient.name = name
+                    findClient.apellidos = apellidos
+                    findClient.telefono = telefono
+                    Log.d(TAG, "El cliente con id = $id, ha sido actualizado correctamente")
+                } else {
+                    Log.d(TAG, "El cliente con id = $id, no ha sido encontrado para actualizar")
+                }
+                showConsoleData()
+            }
+
+            setOnDeleteListener { id ->
+                val wasDeleted = myListClient.removeAll { it.id == id }
+                if (wasDeleted) {
+                    Log.d(TAG, "El cliente con id = $id, ha sido eliminado correctamente")
+                } else {
+                    Log.d(TAG, "El cliente con id = $id, no ha sido encontrado para eliminar")
+                }
+                showConsoleData()
+            }
         }
 
-        myButtonUpdate.setOnClickListener{
-            myDialog.show(1)  //mostramos el dialogo que me permite la edición de datos en los campos de edición.
-
+        myButtonAdd.setOnClickListener {
+            myDialog.show(0)
         }
 
-        myButtonDel.setOnClickListener( {
-            myDialog.show(2)  //mostramos el dialogo que me permite la eliminación de datos en los campos de edición.
+        myButtonUpdate.setOnClickListener {
+            val clientIdToUpdate = RepositoryClient.primary - 1
+            myDialog.show(1, clientIdToUpdate)
+        }
 
-        })
-
-
-    }
-
-
-    override fun ClientAdd(id: Int, name: String, apellidos: String, telefono: Int){
-        val newClient = Client (id, name, apellidos, telefono)
-        controller.ClientAddController(newClient)
-        var msg =  "El cliente con id = $id, ha sido insertado correctamente"
-
-        Log.d(TAG, msg)
-        showConsoleData(msg)
-    }
-
-    override fun ClientDel(id: Int) {
-        var msg = ""
-        val delete = controller.ClientDelController(id)  //borramos
-
-        if (delete)
-            msg =  "El cliente con id = $id, ha sido eliminado correctamente"
-        else
-            msg = "El cliente con id = $id, no ha sido encontrado para eliminar"
-
-        Log. d(TAG, msg)
-        showConsoleData(msg)
+        myButtonDel.setOnClickListener {
+            val clientIdToDelete = RepositoryClient.primary - 1
+            myDialog.show(2, clientIdToDelete)
+        }
 
     }
 
+    private fun showConsoleData() {
 
-
-    override fun ClientUpdate(id: Int, name: String) {
-        var msg = ""
-        val update = controller.ClientUpdateController(id, name)  //borramos el 2.
-
-        if (update)
-            msg =  "El cliente con id = $id, ha sido actualizado correctamente"
-        else
-            msg = "El cliente con id = $id, no ha sido encontrado para eliminar"
-
-        Log. d(TAG, msg)
-        showConsoleData(msg)
-
-    }
-
-    fun showConsoleData(msg:String){
-        val msg = controller.showData()
-        Thread.sleep(2000)
-        Log. d(TAG, msg)
+        val msg = myListClient.joinToString { "ID: ${it.id}, Nombre: ${it.name}, Apellidos: ${it.apellidos}, Teléfono: ${it.telefono}" }
+        Log.d(TAG, "Lista de Clientes: $msg")
     }
 }
